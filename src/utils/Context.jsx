@@ -1,6 +1,6 @@
 import axios from "./axios";
 import React, { useState, createContext, useEffect } from "react";
-import fallbackData from "./fallbackData"; // import the fallback data
+import fallbackData from "../utils/fallBackData"; // import the fallback data
 
 export const ProductContext = createContext();
 
