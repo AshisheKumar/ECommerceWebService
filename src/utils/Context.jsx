@@ -1,36 +1,35 @@
 import axios from "./axios";
 import React, { useState, createContext, useEffect } from "react";
-import fallBackData from "./fallBackData";
+import fallbackData from "./fallbackData"; // import the fallback data
 
 export const ProductContext = createContext();
 
 const Context = (props) => {
   const [products, setProducts] = useState(
-    JSON.parse(localStorage.getItem("products")) || []
+    JSON.parse(localStorage.getItem("products")) || null
   );
 
   useEffect(() => {
-    const isLocalhost = window.location.hostname === "localhost";
-
-    if (!products.length) {
-      if (isLocalhost) {
-        // Fetch products from the live API when on localhost
-        axios
-          .get("/products")
-          .then((response) => {
-            setProducts(response.data);
-            localStorage.setItem("products", JSON.stringify(response.data));
-          })
-          .catch((error) => {
-            console.error("Failed to fetch products:", error);
-          });
-      } else {
-        // Use fallback products data when not on localhost (Render deployment)
-        setProducts(fallbackProducts);
-        localStorage.setItem("products", JSON.stringify(fallbackProducts));
-      }
+    if (!products) {
+      console.log("No products in localStorage, fetching data...");
+      axios
+        .get("/products")
+        .then((response) => {
+          console.log("Fetched products from API:", response.data);
+          setProducts(response.data);
+          localStorage.setItem("products", JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.error(
+            "Error fetching products from API, using fallback data",
+            error
+          );
+          setProducts(fallbackData); // Use fallback data if API request fails
+        });
+    } else {
+      console.log("Products found in localStorage:", products);
     }
-  }, []);
+  }, [products]);
 
   return (
     <ProductContext.Provider value={[products, setProducts]}>
